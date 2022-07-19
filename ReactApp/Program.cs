@@ -7,6 +7,7 @@ using ReactApp.DbModels;
 using ReactApp.Models;
 using Azure.Identity;
 using ReactApp.Controllers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,8 @@ builder.Services.AddIdentityServer()
 
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
+
+builder.Services.Configure<JwtBearerOptions>("IdentityServerJwtBearer", o => o.Authority = "https://localhost:44439");
 
 builder.Services.AddControllersWithViews();
 

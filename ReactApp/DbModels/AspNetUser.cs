@@ -10,6 +10,7 @@ namespace ReactApp.DbModels
             AspNetUserClaims = new HashSet<AspNetUserClaim>();
             AspNetUserLogins = new HashSet<AspNetUserLogin>();
             AspNetUserTokens = new HashSet<AspNetUserToken>();
+            Notes = new HashSet<Note>();
             Roles = new HashSet<AspNetRole>();
         }
 
@@ -32,6 +33,7 @@ namespace ReactApp.DbModels
         public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual ICollection<AspNetUserLogin> AspNetUserLogins { get; set; }
         public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; }
+        public virtual ICollection<Note> Notes { get; set; }
 
         public virtual ICollection<AspNetRole> Roles { get; set; }
     }

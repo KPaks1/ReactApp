@@ -24,13 +24,28 @@ namespace ReactApp.Controllers
 
         // GET: api/Notes
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
         {
-          if (_context.Notes == null)
-          {
-              return NotFound();
-          }
+            if (_context.Notes == null)
+            {
+                return NotFound();
+            }
+            //return await _context.Notes.Where(u => u.UserId == id).ToListAsync();
             return await _context.Notes.ToListAsync();
+        }
+
+        // GET: api/Notes/ByUser/UserGUID
+        [HttpGet("ByUser/{userId}")]
+        public async Task<ActionResult<IEnumerable<Note>>> GetAllUserNotes(string userId)
+        {
+            Console.WriteLine(userId);
+            if (_context.Notes == null || _context.AspNetUsers == null)
+            {
+                return NotFound();
+            }
+            //return await _context.Notes.Where(u => u.UserId == id).ToListAsync();
+            return await _context.Notes.Where(n=>n.UserId == userId).ToListAsync();
         }
 
         // GET: api/Notes/5

@@ -154,9 +154,20 @@ namespace ReactApp.DbModels
 
             modelBuilder.Entity<Note>(entity =>
             {
+                entity.Property(e => e.CreateTimestamp).HasDefaultValueSql("(sysutcdatetime())");
+
                 entity.Property(e => e.Description).HasMaxLength(50);
 
                 entity.Property(e => e.Title).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateTimestamp).HasDefaultValueSql("(sysutcdatetime())");
+
+                entity.Property(e => e.UserId).HasMaxLength(450);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Notes)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK__Notes__UserId__7D439ABD");
             });
 
             modelBuilder.Entity<PersistedGrant>(entity =>
