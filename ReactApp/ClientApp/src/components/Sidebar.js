@@ -8,8 +8,10 @@ export class Sidebar extends Component
         super(props);
         this.state = {
             notes: props.notes ? props.notes : [],
-            loading: props.loading
-        };
+            prevNotes: [],
+            loading: props.newNote ? true : false,
+            newNote: props.newNote ? props.newNote : {}
+        }
     }
 
     static renderSideBar(notes) { 
@@ -33,7 +35,7 @@ export class Sidebar extends Component
 
     render(){
         let contents = this.state.loading
-            ? <p><em>Loading notes...</em></p>
+            ? this.setState({ loading: false })
             : Sidebar.renderSideBar(this.state.notes);
 
         return (
@@ -42,7 +44,7 @@ export class Sidebar extends Component
                     <h1>Notes</h1>
                     <button>{this.state.notes.length}</button>
                 </div>
-                {contents}                
+                {contents}             
             </div>
 
         );

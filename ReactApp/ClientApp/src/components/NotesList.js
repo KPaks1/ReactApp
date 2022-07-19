@@ -6,7 +6,6 @@ export class NotesList extends Component {
 
     constructor(props) {
         super(props);
-        console.log(props);
         this.state = {
             Title: '',
             Description: '',

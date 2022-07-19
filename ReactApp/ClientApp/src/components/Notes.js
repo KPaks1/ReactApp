@@ -3,8 +3,7 @@ import { Sidebar } from './Sidebar';
 import { NotesList } from './NotesList';
 import authService from './api-authorization/AuthorizeService';
 
-export class Notes extends Component
-{
+export class Notes extends Component {
     static displayName = Notes.name;
 
     constructor(props) {
@@ -12,23 +11,35 @@ export class Notes extends Component
         this.state = {
             currentUser: null,
             notes: [],
+            prevNotes: [],
             loading: true,
+            newNote: {},
             activeNote: null,
             selectedNote: null
         };
-        
-        //this.onAddNote = this.onAddNote.bind(this);
         this.onSaveNote = this.onSaveNote.bind(this);
         this.setActiveNote = this.setActiveNote.bind(this);
         this.onDeleteNote = (note) => this.onDeleteNote.bind(this);
+        this.renderNotesPage = this.renderNotesPage.bind(this);
     }
 
     async componentDidMount() {
         await this.setCurrentUser();
         await this.populateUserNotesData();
-    }   
+    }
 
-    setActiveNote = (note) => {
+    async componentDidUpdate() {
+        if (this.state.prevNotes != this.state.notes) {
+            await this.populateUserNotesData().then(
+                this.contents = await this.renderNotesPage()
+            );
+            console.log("notes data called");
+            
+        }
+    }
+
+
+    setActiveNote(note) {
         this.setState({ activeNote: note });
     }
 
@@ -43,23 +54,26 @@ export class Notes extends Component
         }
     }
 
-    onSaveNote(note) {
-        let newNote = JSON.stringify({
+    // Creates a note object, sends posts to the DB
+    async onSaveNote(note) {
+        let newNote = {
             Title: note.Title,
             Description: note.Description,
             UserId: this.state.currentUser.sub
-        });
-        this.setState({ notes: [newNote, ...this.state.notes] });
-        this.postNewNote(newNote);
+        };
+        
+        const savedNote = await this.postNewNote(newNote);
+        console.log(`${this.state.notes.length}`)
+        this.setState({ notes: [savedNote, ...this.state.notes] });
+        console.log(`${this.state.notes.length}`);
     }
 
-    
 
     /* RENDER FUNCTIONS *
      ********************/
 
     render() {
-        let contents = this.state.loading
+        var contents = this.state.loading
             ? <p><em>Loading...</em></p>
             : this.renderNotesPage(this.state.notes);
         return (
@@ -72,14 +86,14 @@ export class Notes extends Component
     renderNotesPage(notes) {
         return (
             <div className="App">
-                <Sidebar notes={this.state.notes} loading={this.state.loading} selectedNote={this.state.selectedNote} />
-                <NotesList notes={this.state.notes} onSaveNote={this.onSaveNote} activeNote={this.getActiveNote()} />
+                <Sidebar notes={notes} newNote={this.newNote} selectedNote={this.state.selectedNote} populateUserNotesData={this.populateUserNotesData} />
+                <NotesList notes={notes} onSaveNote={this.onSaveNote} activeNote={this.getActiveNote()} />
             </div>
         );
     }
-    
-     /* ASYNC FUNCTIONS *
-     ********************/
+
+    /* ASYNC FUNCTIONS *
+    ********************/
 
     // Get all notes from DB
     async populateNotesData() {
@@ -90,7 +104,6 @@ export class Notes extends Component
         });
         const data = await response.json();
         this.setState({ notes: data, loading: false });
-        console.log(this.state.notes);
     }
 
     // Get users notes from DB
@@ -98,11 +111,10 @@ export class Notes extends Component
         const token = await authService.getAccessToken();
         const response = await fetch(`./api/notes/byuser/${this.state.currentUser.sub}`, {
             method: 'GET',
-            headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type' : 'application/json'},
+            headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type': 'application/json' },
         });
         const data = await response.json();
-        this.setState({ notes: data, loading: false });
-        console.log(this.state.notes);
+        this.setState({ notes: data, prevNotes: data, loading: false });
     }
 
     async getNote(id) {
@@ -118,16 +130,20 @@ export class Notes extends Component
     // Post Note from DB
     async postNewNote(newNote) {
         const token = await authService.getAccessToken();
-        const response = await fetch('./api/notes/', {
+        await fetch('./api/notes/', {
             method: 'POST',
             headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: newNote
-        }).then(() => {
-            console.log(`new note added ${newNote.Title}, ${newNote.Description} ${newNote.UserId}`);
-        });
-        const result = await response;
-        console.log(result);
-    }
+            body: JSON.stringify(newNote)
+        })
+            .then((Response) => {
+                Response.json()
+                    .then((note) => {
+                        console.log(note);
+                        return note;
+                    });
+            });
+    };
+    
     // Delete Note from DB
     async deleteNote() {
         const token = await authService.getAccessToken();

@@ -106,10 +106,10 @@ namespace ReactApp.Controllers
           {
               return Problem("Entity set 'DatabaseContext.Notes'  is null.");
           }
-            _context.Notes.Add(note);
-            await _context.SaveChangesAsync();
+            await _context.Notes.AddAsync(note);
+            var inserted = await _context.SaveChangesAsync();
+            return (inserted == 1 ? CreatedAtAction("GetNote", new { id = note.Id }, note) : BadRequest());
 
-            return CreatedAtAction("GetNote", new { id = note.Id }, note);
         }
 
         // DELETE: api/Notes/5
