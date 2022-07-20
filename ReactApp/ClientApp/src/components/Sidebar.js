@@ -7,11 +7,20 @@ export class Sidebar extends Component
     constructor(props) {
         super(props);
         this.state = {
+            title: props.title ? props.title : 'Sidebar',
             notes: props.notes ? props.notes : [],
             prevNotes: [],
             loading: props.newNote ? true : false,
             newNote: props.newNote ? props.newNote : {}
         }
+        this.setActiveNote = this.setActiveNote.bind(this);
+    }
+
+    setActiveNote(event) {
+        event.preventDefault();
+        var newItem = this.state.notes.find(x => x.id === event.target.key.value);
+        this.setState({ selectedNote: newItem });
+        console.log("note hit!");
     }
 
     static renderSideBar(notes) { 
@@ -22,7 +31,7 @@ export class Sidebar extends Component
                         <div key={note.id} className="app-sidebar-note">
                             <div className="app-note-title">
                                 <strong> {note.title} </strong>
-                                <button> Delete </button>
+                                <button key={note.id} onSelect={this.setActiveNote}> Delete </button>
                             </div>
                             <p> {note.description} </p>
                             <small className="note-meta"> Last modified: {note.updateTimestamp}</small>
@@ -41,12 +50,11 @@ export class Sidebar extends Component
         return (
             <div className="app-sidebar">
                 <div className="app-sidebar-header">
-                    <h1>Notes</h1>
+                    <h1>{this.state.title }</h1>
                     <button>{this.state.notes.length}</button>
                 </div>
                 {contents}             
             </div>
-
         );
     }
 }

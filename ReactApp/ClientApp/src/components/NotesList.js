@@ -1,5 +1,4 @@
-﻿import React, { Component } from 'react'
-import { Notes } from './Notes';
+﻿import React, { Component } from 'react';
 
 export class NotesList extends Component {
     static displayName = NotesList.name;

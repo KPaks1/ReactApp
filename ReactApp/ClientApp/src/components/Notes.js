@@ -18,9 +18,11 @@ export class Notes extends Component {
             selectedNote: null
         };
         this.onSaveNote = this.onSaveNote.bind(this);
-        this.setActiveNote = this.setActiveNote.bind(this);
         this.onDeleteNote = (note) => this.onDeleteNote.bind(this);
         this.renderNotesPage = this.renderNotesPage.bind(this);
+        this.setActiveNote = this.setActiveNote.bind(this);
+
+        this.contents = <p><em>Loading...</em></p>;   
     }
 
     async componentDidMount() {
@@ -28,19 +30,18 @@ export class Notes extends Component {
         await this.populateUserNotesData();
     }
 
-    async componentDidUpdate() {
+    componentDidUpdate() {
         if (this.state.prevNotes != this.state.notes) {
-            await this.populateUserNotesData().then(
-                this.contents = await this.renderNotesPage()
-            );
+            this.populateUserNotesData();
+            this.contents = this.renderNotesPage(this.state.notes);
             console.log("notes data called");
-            
         }
     }
 
-
-    setActiveNote(note) {
-        this.setState({ activeNote: note });
+    setActiveNote(event) {
+        var newItem = this.state.notes.find(x => x.id === event.target.key)
+        this.setState({ selectedNote: newItem });
+        alert("NOTE HIT!");
     }
 
     getActiveNote = () => {
@@ -73,12 +74,13 @@ export class Notes extends Component {
      ********************/
 
     render() {
-        var contents = this.state.loading
+        this.contents = this.state.loading
             ? <p><em>Loading...</em></p>
             : this.renderNotesPage(this.state.notes);
+
         return (
             <div>
-                {contents}
+                {this.contents}
             </div>
         );
     }
@@ -86,8 +88,8 @@ export class Notes extends Component {
     renderNotesPage(notes) {
         return (
             <div className="App">
-                <Sidebar notes={notes} newNote={this.newNote} selectedNote={this.state.selectedNote} populateUserNotesData={this.populateUserNotesData} />
-                <NotesList notes={notes} onSaveNote={this.onSaveNote} activeNote={this.getActiveNote()} />
+                <Sidebar title="Notes" notes={this.state.notes} newNote={this.newNote} selectedNote={this.state.selectedNote} populateUserNotesData={this.populateUserNotesData} />
+                <NotesList notes={notes} onSaveNote={this.onSaveNote} activeNote={this.getActiveNote} />
             </div>
         );
     }
