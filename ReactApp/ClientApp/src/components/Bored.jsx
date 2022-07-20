@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { ActivitySidebar } from './ActiviySideBar';
-import { Sidebar } from './Sidebar';
+
 export class Bored extends Component {
     static displayName = Bored.name;
 
@@ -8,14 +8,16 @@ export class Bored extends Component {
         super(props);
         this.state = {
             activities: [],
+            savedActivities: [],
             loading: true,
             updateSideBar: true
         };
         this.getSomethingToDo = this.getSomethingToDo.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.getSomethingToDo();
+        //await this.getUsersSavedActivities();
     }
 
     /* RENDER FUNCTIONS *
@@ -23,9 +25,8 @@ export class Bored extends Component {
 
     renderSideBar() {
         return (
-            <ActivitySidebar title="Bored Activities" activities={this.state.activities} />
+            <ActivitySidebar title="My Activities" activities={this.state.activities} />
         );
-
     }
 
     renderActivities() {
@@ -83,11 +84,15 @@ export class Bored extends Component {
     /* ASYNC FUNCTIONS *
     *******************/
 
+    // Get a new activities to be able to be saved in the users sidebar
     async getSomethingToDo() {
         var currentActivities = [];
-        const response = await fetch('https://www.boredapi.com/api/activity?minaccessibility=0.3&maxaccessibility=1', {
+        const response = await fetch(
+            'https://www.boredapi.com/api/activity?minaccessibility=0.3&maxaccessibility=1',
+            {
             method: 'GET'
-        });
+            }
+        );
         await response.json().then(data => (
             currentActivities.push(data)
         )
@@ -95,4 +100,16 @@ export class Bored extends Component {
         this.setState({ updateSideBar: true });
         this.setState({ activities: [...new Set(this.state.activities.concat(currentActivities))], loading: false, updateSideBar: false });
     }
+
+    // Get users notes from DB
+    //async getUsersSavedActivities() {
+    //    const token = await authService.getAccessToken();
+    //    const response = await fetch(`./api/activities/byuser/${this.state.currentUser.sub}`, {
+    //        method: 'GET',
+    //        headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type': 'application/json' },
+    //    });
+    //    const data = await response.json();
+    //    this.setState({ updateSideBar: true });
+    //    this.setState({ activities: [...new Set(this.state.activities.concat(currentActivities))], loading: false, updateSideBar: false });
+    //}
 }

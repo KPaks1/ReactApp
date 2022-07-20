@@ -13,11 +13,11 @@ export class ActivitySidebar extends Component
         }
     }
 
-    static renderSideBar(activities) { 
+    renderSideBar() { 
         return (
             <div>
                 <div className="app-sidebar-notes">
-                    {activities.map(activity =>
+                    {this.state.activities.map(activity =>
                         <div key={activity.key} className="app-sidebar-note">
                             <div className="app-note-title">
                                 <strong> {activity.activity} </strong>
@@ -34,7 +34,7 @@ export class ActivitySidebar extends Component
     render(){
         let contents = this.state.loading
             ? this.setState({ loading: false })
-            : ActivitySidebar.renderSideBar(this.state.activities);
+            : this.renderSideBar();
 
         return (
             <div className="app-sidebar">
