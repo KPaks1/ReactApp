@@ -13,9 +13,10 @@ export class Notes extends Component {
             notes: [],
             prevNotes: [],
             loading: true,
+            updateSideBar: true,
             newNote: {},
             activeNote: null,
-            selectedNote: null
+            selectedNote: null            
         };
         this.onSaveNote = this.onSaveNote.bind(this);
         this.onDeleteNote = (note) => this.onDeleteNote.bind(this);
@@ -33,8 +34,6 @@ export class Notes extends Component {
     componentDidUpdate() {
         if (this.state.prevNotes != this.state.notes) {
             this.populateUserNotesData();
-            this.contents = this.renderNotesPage(this.state.notes);
-            console.log("notes data called");
         }
     }
 
@@ -74,23 +73,31 @@ export class Notes extends Component {
      ********************/
 
     render() {
-        this.contents = this.state.loading
+        let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderNotesPage(this.state.notes);
+            : this.renderNotesPage();
+
+        let noteSideBar = this.state.updateSideBar
+            ? null
+            : this.renderNotesSideBar();
 
         return (
-            <div>
-                {this.contents}
+            <div className="App">
+                {noteSideBar}
+                {contents}
             </div>
         );
     }
 
-    renderNotesPage(notes) {
+    renderNotesSideBar() {
+        return(
+            <Sidebar title="Notes" notes={this.state.notes} newNote={this.newNote} selectedNote={this.state.selectedNote} populateUserNotesData={this.populateUserNotesData} />
+        );
+    }
+
+    renderNotesPage() {
         return (
-            <div className="App">
-                <Sidebar title="Notes" notes={this.state.notes} newNote={this.newNote} selectedNote={this.state.selectedNote} populateUserNotesData={this.populateUserNotesData} />
-                <NotesList notes={notes} onSaveNote={this.onSaveNote} activeNote={this.getActiveNote} />
-            </div>
+            <NotesList notes={this.state.notes} onSaveNote={this.onSaveNote} activeNote={this.getActiveNote} />
         );
     }
 
@@ -116,7 +123,8 @@ export class Notes extends Component {
             headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type': 'application/json' },
         });
         const data = await response.json();
-        this.setState({ notes: data, prevNotes: data, loading: false });
+        this.setState({ updateSideBar: true });
+        this.setState({ notes: data, prevNotes: data, loading: false, updateSideBar: false });
     }
 
     async getNote(id) {
@@ -147,9 +155,9 @@ export class Notes extends Component {
     };
     
     // Delete Note from DB
-    async deleteNote() {
+    async deleteNote(id) {
         const token = await authService.getAccessToken();
-        const response = await fetch('./api/notes', {
+        const response = await fetch(`./api/notes/${id}`, {
             method: 'DELETE',
             headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
         });
