@@ -16,6 +16,7 @@ namespace ReactApp.DbModels
         {
         }
 
+        public virtual DbSet<Activity> Activities { get; set; } = null!;
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; } = null!;
         public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; } = null!;
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; } = null!;
@@ -27,9 +28,36 @@ namespace ReactApp.DbModels
         public virtual DbSet<Note> Notes { get; set; } = null!;
         public virtual DbSet<PersistedGrant> PersistedGrants { get; set; } = null!;
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Activity>(entity =>
+            {
+                entity.HasKey(e => e.Key)
+                    .HasName("PK__Activiti__C41E0288FE6EA154");
+
+                entity.Property(e => e.Key).HasMaxLength(50);
+
+                entity.Property(e => e.Accessibility).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Activity1)
+                    .HasMaxLength(255)
+                    .HasColumnName("Activity");
+
+                entity.Property(e => e.Link).HasMaxLength(100);
+
+                entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Type).HasMaxLength(50);
+
+                entity.Property(e => e.UserId).HasMaxLength(450);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Activities)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Activitie__UserI__4CA06362");
+            });
+
             modelBuilder.Entity<AspNetRole>(entity =>
             {
                 entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
@@ -167,7 +195,8 @@ namespace ReactApp.DbModels
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Notes)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Notes__UserId__7D439ABD");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Notes__UserId__412EB0B6");
             });
 
             modelBuilder.Entity<PersistedGrant>(entity =>
