@@ -66,9 +66,19 @@ namespace ReactApp.Controllers
             {
                 return Problem("Entity set 'DatabaseContext.Activities'  is null.");
             }
+            Console.WriteLine(activity.Key);
+            Console.WriteLine(activity.Name);
+            Console.WriteLine(activity.Type);
+            Console.WriteLine(activity.Price);
+            Console.WriteLine(activity.Accessibility);
+            Console.WriteLine(activity.Link);
+            Console.WriteLine(activity.UserId);
+
             await _context.Activities.AddAsync(activity);
-            var inserted = await _context.SaveChangesAsync();
-            return (inserted == 1 ? CreatedAtAction("GetActivity", activity.Key) : BadRequest());
+            await _context.SaveChangesAsync();
+            
+
+            return CreatedAtAction("GetActivity", activity.Key);
 
         }
 

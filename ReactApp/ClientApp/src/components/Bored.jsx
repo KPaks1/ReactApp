@@ -14,40 +14,37 @@ export class Bored extends Component {
             loading: true,
             updateSideBar: true
         };
-        this.getSomethingToDo = this.getSomethingToDo.bind(this);
-        this.getUsersSavedActivities = this.getUsersSavedActivities.bind(this);
+        //this.getAllActivities = this.getAllActivities.bind(this);
+        //this.getUserActivities = this.getUserActivities.bind(this);
         this.saveActivity = this.saveActivity.bind(this);
     }
 
     async componentDidMount() {
         await this.setCurrentUser();
-        await this.getUsersSavedActivities();
-        await this.getSomethingToDo();
+        await this.getUserActivities();
+        await this.getAllActivities();
 
     }
 
-    async componentDidUpdate() {
-        if (this.state.prevNotes != this.state.notes) {
-            this.getUsersSavedActivities();
-        }
-    }
+    /* FUNCTIONS *
+    *************/
 
     async saveActivity(event) {
         event.preventDefault();
-        let activity = (this.state.activities.find((activity) => activity.id === event.target.key));
+        let activity = (this.state.activities.find((a) => a.key == event.target.value));
         var newActivity = {
             Key: activity.key,
-            Name: activity.activity,
+            Name: activity.name,
+            Accessibility: activity.accessibility,
             Type: activity.type,
-            Participants: activity.participants,
             Price: activity.price,
             Link: activity.link,
-            UserId: this.state.currentUser.sub,
-            Accessibility: activity.accessibility,
+            UserId: this.state.currentUser.sub
         }
-        const savedActivity = await this.postNewActivity(newActivity);
-        this.setState({ savedActivities: [savedActivity, ...this.state.savedActivities] });
-
+        await this.postNewActivity(newActivity).then(savedActivity => (
+            this.getUserActivities(),
+            this.setState({ savedActivities: [savedActivity, ...this.state.savedActivities]})
+        ));
     }
 
     /* RENDER FUNCTIONS *
@@ -61,33 +58,27 @@ export class Bored extends Component {
 
     renderActivities() {
         return (              
-            <div className="app-main">
-                <table className='table table-striped' aria-labelledby="tabelLabel">
+            <div className="app-main app-table-main">
+                <table className='table table-striped'>
                     <thead>
                         <tr>
                             <th>Activity</th>
                             <th>Type</th>
-                            <th>Realistic</th>
-                                <th>
-                                    <button onClick={this.getSomethingToDo}>New Activity</button>
-                            </th>
+                            <th>Save</th>
                         </tr>
                     </thead>
                     <tbody>
                         {this.state.activities.map(activity =>
                             <tr key={activity.key}>
                                 <td>
-                                    {activity.activity}
+                                    {activity.name}
                                 </td>
                                 <td>
                                     {activity.type}
                                 </td>
                                 <td>
-                                    {activity.accessibility*10}/10
+                                    <button value={activity.key} onClick={this.saveActivity}>Add</button>
                                 </td>
-                                <td>
-                                    <button key={activity.key} onClick={this.saveActivity}>Add</button>
-                                    </td>
                             </tr>
                             )}
                     </tbody>
@@ -118,23 +109,23 @@ export class Bored extends Component {
     *******************/
 
     // Get a new activities to be able to be saved in the users sidebar
-    async getSomethingToDo() {
-        var currentActivities = [];
+    async getAllActivities() {
+        const token = await authService.getAccessToken();
         const response = await fetch(
-            'https://www.boredapi.com/api/activity?minaccessibility=0.3&maxaccessibility=1',
+            'api/boredactivity/',
             {
                 method: 'GET',
+                headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type': 'application/json' }
             }
         );
         await response.json().then(data => (
-            currentActivities.push(data)
-        )
-        );
-        this.setState({ activities: [...new Set(this.state.activities.concat(currentActivities))], loading: false});
+            this.setState({ activities: data }),
+            this.setState({ loading: false })
+        ));
     }
-
+        
     //Get users notes from DB
-    async getUsersSavedActivities() {
+    async getUserActivities() {
         const token = await authService.getAccessToken();
         const response = await fetch(
             `/api/activities/byuser/${this.state.currentUser.sub}`,
@@ -144,9 +135,8 @@ export class Bored extends Component {
             }
         );
         await response.json().then(data => (
-        console.log(data),
-        this.setState({ updateSideBar: true }),
-        this.setState({ savedActivities: data, loading: false, updateSideBar: false })
+            this.setState({ updateSideBar: true }),
+            this.setState({ savedActivities: data, loading: false, updateSideBar: false })
         ));    
     }
 
@@ -169,6 +159,5 @@ export class Bored extends Component {
     // Get current user
     async setCurrentUser() {
         await this.setState({ currentUser: await authService.isAuthenticated() ? await authService.getUser() : null });
-        console.log("User Set");
     }
 }

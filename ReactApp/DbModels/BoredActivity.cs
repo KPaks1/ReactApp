@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ReactApp.DbModels
 {
     [Serializable]
-    public partial class Activity
+    public partial class BoredActivity
     {
         public string Key { get; set; } = null!;
         public string Name { get; set; } = null!;
@@ -12,8 +12,6 @@ namespace ReactApp.DbModels
         public string? Type { get; set; }
         public decimal? Price { get; set; }
         public string? Link { get; set; }
-        public string? UserId { get; set; }
 
-        public virtual AspNetUser? User { get; set; }
     }
 }

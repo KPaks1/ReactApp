@@ -17,6 +17,8 @@ namespace ReactApp.DbModels
         }
 
         public virtual DbSet<Activity> Activities { get; set; } = null!;
+
+        public virtual DbSet<BoredActivity> BoredActivities { get; set; } = null!;
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; } = null!;
         public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; } = null!;
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; } = null!;
@@ -145,6 +147,27 @@ namespace ReactApp.DbModels
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AspNetUserTokens)
                     .HasForeignKey(d => d.UserId);
+            });
+
+            modelBuilder.Entity<BoredActivity>(entity =>
+            {
+                entity.HasKey(e => e.Key)
+                    .HasName("PK__Activiti__C41E0288FE6EA154");
+
+                entity.Property(e => e.Key).HasMaxLength(50);
+
+                entity.Property(e => e.Accessibility).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(255)
+                    .HasColumnName("Name");
+
+                entity.Property(e => e.Link).HasMaxLength(100);
+
+                entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Type).HasMaxLength(50);
+
             });
 
             modelBuilder.Entity<DeviceCode>(entity =>
