@@ -22,8 +22,6 @@ export class Notes extends Component {
         this.onDeleteNote = (note) => this.onDeleteNote.bind(this);
         this.renderNotesPage = this.renderNotesPage.bind(this);
         this.setActiveNote = this.setActiveNote.bind(this);
-
-        this.contents = <p><em>Loading...</em></p>;   
     }
 
     async componentDidMount() {
@@ -63,9 +61,7 @@ export class Notes extends Component {
         };
         
         const savedNote = await this.postNewNote(newNote);
-        console.log(`${this.state.notes.length}`)
         this.setState({ notes: [savedNote, ...this.state.notes] });
-        console.log(`${this.state.notes.length}`);
     }
 
 
@@ -120,7 +116,7 @@ export class Notes extends Component {
         const token = await authService.getAccessToken();
         const response = await fetch(`./api/notes/byuser/${this.state.currentUser.sub}`, {
             method: 'GET',
-            headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type': 'application/json' },
+            headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'content-type': 'application/json' }
         });
         const data = await response.json();
         this.setState({ updateSideBar: true });

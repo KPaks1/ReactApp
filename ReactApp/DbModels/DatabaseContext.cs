@@ -39,9 +39,9 @@ namespace ReactApp.DbModels
 
                 entity.Property(e => e.Accessibility).HasColumnType("decimal(18, 0)");
 
-                entity.Property(e => e.Activity1)
+                entity.Property(e => e.Name)
                     .HasMaxLength(255)
-                    .HasColumnName("Activity");
+                    .HasColumnName("Name");
 
                 entity.Property(e => e.Link).HasMaxLength(100);
 

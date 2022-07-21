@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ReactApp.Models;
-using ReactApp.DbModels;
 
 namespace ReactApp.Data
 {

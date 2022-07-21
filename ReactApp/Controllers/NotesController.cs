@@ -44,7 +44,6 @@ namespace ReactApp.Controllers
             {
                 return NotFound();
             }
-            //return await _context.Notes.Where(u => u.UserId == id).ToListAsync();
             return await _context.Notes.Where(n=>n.UserId == userId).ToListAsync();
         }
 

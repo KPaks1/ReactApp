@@ -8,7 +8,7 @@ export class ActivitySidebar extends Component
         super(props);
         this.state = {
             title: props.title ? props.title : 'Sidebar',
-            activities: props.activities ? props.activities : [],
+            savedActivities: props.savedActivities ? props.savedActivities : [],
             loading: props.loading ? true : false
         }
     }
@@ -17,10 +17,10 @@ export class ActivitySidebar extends Component
         return (
             <div>
                 <div className="app-sidebar-notes">
-                    {this.state.activities.map(activity =>
+                    {this.state.savedActivities.map(activity =>
                         <div key={activity.key} className="app-sidebar-note">
                             <div className="app-note-title">
-                                <strong> {activity.activity} </strong>
+                                <strong> {activity.name} </strong>
                                 {/*<button key={activity.key}> Delete </button>*/}
                             </div>
                             <small> {activity.type} </small>
@@ -40,7 +40,7 @@ export class ActivitySidebar extends Component
             <div className="app-sidebar">
                 <div className="app-sidebar-header">
                     <h1>{this.state.title}</h1>
-                    <button>{this.state.activities.length}</button>
+                    <button>{this.state.savedActivities.length}</button>
                 </div>
                 {contents}             
             </div>
